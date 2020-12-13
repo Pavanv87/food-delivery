@@ -34,7 +34,7 @@ func Migrate(dbName string, client *mongo.Client) {
 		},
 		{
 		  "insert":"foodItem",
-		  "documents": [{"name":"FoodItem1"},{"name":"FoodItem2"},{"name":"FoodItem3"}]
+		  "documents": [{"name":"FoodItem1","cost":50, "preparationTime":15},{"name":"FoodItem2","cost":70, "preparationTime":20},{"name":"FoodItem3","cost":100, "preparationTime":30}]
 		},
 		{
 		  "insert":"driver",
@@ -44,6 +44,6 @@ func Migrate(dbName string, client *mongo.Client) {
 
 	err = d.Run(bytes.NewReader(cmds))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }

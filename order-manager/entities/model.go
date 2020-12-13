@@ -3,9 +3,10 @@ package entities
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type FoodItem struct {
-	Name            string `json:"name" bson:"name"`
-	Cost            int    `json:"cost" bson:"cost"`
-	PreparationTime int    `json:"preparationTime" bson:"preparationTime"` //In Minutes
+	Id              primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	Name            string             `json:"name" bson:"name"`
+	Cost            int                `json:"cost" bson:"cost"`
+	PreparationTime int                `json:"preparationTime" bson:"preparationTime"` //In Minutes
 }
 
 type Customer struct {

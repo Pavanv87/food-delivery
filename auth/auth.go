@@ -54,8 +54,7 @@ func signInHandler(w http.ResponseWriter, r *http.Request) {
 func authHandler(w http.ResponseWriter, r *http.Request) {
 	var token string
 
-	// Get token from the Authorization header
-	// format: Authorization: Bearer
+	// Bearer token from Authorization header
 	tokens, ok := r.Header["Authorization"]
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
@@ -63,13 +62,11 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if token == "" {
-		// If we get here, the required token is missing
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	// Now parse the token
+	// parse token
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			msg := fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			return nil, msg
@@ -82,8 +79,6 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Check token is valid
 	if parsedToken != nil && parsedToken.Valid {
-		// Everything worked! Set the user in the context.
-		//context.Set(r, "user", parsedToken)
 		json.NewEncoder(w).Encode(Response{Message: "Success"})
 	}
 }
