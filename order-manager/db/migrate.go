@@ -16,6 +16,7 @@ func Migrate(dbName string, client *mongo.Client) {
 	})
 
 	cmds := []byte(`[
+		{ "create":"order"},
 		{ "create":"user"},
 		{ "createIndexes": "user", "indexes": [{"key": {"name": 1},"name": "unique_user_name","unique": true}] },
 		{ "create":"restaurant"},

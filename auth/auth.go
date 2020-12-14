@@ -1,6 +1,8 @@
 package main
 
 import (
+	"auth/db"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,6 +10,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var SecretKey = []byte("YouAreWelcome")
@@ -22,7 +26,8 @@ type JwtToken struct {
 }
 
 type Response struct {
-	Message string `json:"message"`
+	Message string     `json:"message"`
+	Claim   jwt.Claims `json:"claim"`
 }
 
 func CreateTokenEndpoint(w http.ResponseWriter, req *http.Request) {}
@@ -30,25 +35,51 @@ func CreateTokenEndpoint(w http.ResponseWriter, req *http.Request) {}
 func ProtectedEndpoint(w http.ResponseWriter, req *http.Request) {}
 
 func main() {
+
+	conf := db.Config{Host: "localhost", Port: "27017", Username: "admin", Password: "password", Database: "food-delivery"}
+
+	ctx := context.TODO()
+	mClient := conf.NewClient(ctx) // Mongo client
+	database := mClient.Database(conf.Database)
+
 	router := mux.NewRouter()
-	router.HandleFunc("/auth/signin", signInHandler).Methods("POST")
-	router.HandleFunc("/auth/validate", authHandler).Methods("GET")
+	router.HandleFunc("/auth/{collection}/signin", GetSignInHandler(ctx, database)).Methods("POST")
+	router.HandleFunc("/auth/verify", authHandler).Methods("GET")
 
 	fmt.Println("Auth Service Starting...")
-	http.ListenAndServe(":8080", router)
+	http.ListenAndServe(":8081", router)
 }
 
-func signInHandler(w http.ResponseWriter, r *http.Request) {
-	var user User
-	_ = json.NewDecoder(r.Body).Decode(&user)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Username,
-	})
-	tokenString, error := token.SignedString([]byte(SecretKey))
-	if error != nil {
-		fmt.Println(error)
+func GetSignInHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var user User
+		_ = json.NewDecoder(r.Body).Decode(&user)
+
+		vars := mux.Vars(r)
+		collection := vars["collection"]
+		result := database.Collection(collection).FindOne(ctx, bson.M{"name": user.Username})
+		var dbUser User
+		err := result.Decode(&dbUser)
+		if err != nil {
+			http.Error(w, "User Not Found", 500)
+			return
+		}
+
+		if dbUser.Password != user.Password {
+			http.Error(w, "UserName or Password mismatch", http.StatusUnauthorized)
+			return
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"username": user.Username,
+		})
+		tokenString, err := token.SignedString([]byte(SecretKey))
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		}
+		json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
 	}
-	json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
 }
 
 func authHandler(w http.ResponseWriter, r *http.Request) {
@@ -79,6 +110,6 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Check token is valid
 	if parsedToken != nil && parsedToken.Valid {
-		json.NewEncoder(w).Encode(Response{Message: "Success"})
+		json.NewEncoder(w).Encode(Response{Message: "Success", Claim: parsedToken.Claims})
 	}
 }

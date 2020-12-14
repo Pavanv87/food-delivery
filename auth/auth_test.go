@@ -1,7 +1,9 @@
 package main
 
 import (
+	"auth/db"
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -12,13 +14,21 @@ func TestAuth(t *testing.T) {
 
 	// Obtain Token
 	data, _ := json.Marshal(&User{Username: "pavan", Password: "abc123"})
-	req, err := http.NewRequest("POST", "/auth/signin", bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", "/auth/user/signin", bytes.NewBuffer(data))
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// Not Recommended, probably use dockertest
+	conf := db.Config{Host: "localhost", Port: "27017", Username: "admin", Password: "password", Database: "food-delivery"}
+
+	ctx := context.TODO()
+	mClient := conf.NewClient(ctx) // Mongo client
+
+	database := mClient.Database(conf.Database)
+
 	rr := httptest.NewRecorder()
-	http.HandlerFunc(signInHandler).ServeHTTP(rr, req)
+	http.HandlerFunc(GetSignInHandler(ctx, database)).ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK { // Check status code.
 		t.Errorf("handler returned wrong status code: got %v want %v",

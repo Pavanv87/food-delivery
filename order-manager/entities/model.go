@@ -23,6 +23,16 @@ type Restaurant struct {
 	Name string             `json:"name" bson:"name"`
 }
 
+type FoodOrderDetail struct {
+	FoodItem        FoodItem `json:"foodItem"`
+	BaseCost        int      `json:"baseCost"`
+	Tax             float32  `json:"tax"`
+	Quantity        int      `json:"quantity"`
+	DeliveryCharge  int      `json:"deliveryCharge"`
+	PreparationTime int      `json:"preparationTime"`
+	DeliveryTime    int      `json:"deliveryTime"`
+}
+
 type OrderStatus string
 type DeliveryStatus string
 
@@ -30,15 +40,16 @@ const (
 	New       OrderStatus    = "NEW"
 	Preparing OrderStatus    = "PREPARING"
 	Prepared  OrderStatus    = "PREPARED"
+	Cancelled OrderStatus    = "CANCELLED"
 	Picked    DeliveryStatus = "PICKED"
 	Delivered DeliveryStatus = "DELIVERED"
 )
 
 type Order struct {
-	Status     OrderStatus `json:"status" bson:"status"`
-	CustomerId Customer    `json:"customerId" bson:"customerId"`
-	FoodItem   FoodItem    `json:"foodItemId" bson:"foodItemId"`
-	Restaurant Restaurant  `json:"restaurantId" bson:"restaurantId"`
+	Status          OrderStatus        `json:"status" bson:"status"`
+	Customer        string             `json:"customer" bson:"customer"`
+	FoodOrderDetail FoodOrderDetail    `json:"foodOrderDetail" bson:"foodOrderDetail"`
+	RestaurantId    primitive.ObjectID `json:"restaurantId" bson:"restaurantId"`
 }
 
 type Delivery struct {
