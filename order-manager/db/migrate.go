@@ -27,11 +27,11 @@ func Migrate(dbName string, client *mongo.Client) {
 		{ "createIndexes": "driver", "indexes": [{"key": {"name": 1},"name": "unique_driver_name","unique": true}] },
 		{
 		  "insert":"user",
-		  "documents": [{"name":"Customer1", "password":"pass1"},{"name":"Customer2", "password":"pass2"},{"name":"Customer3", "password":"pass3"}]
+		  "documents": [{"name":"Customer1", "password":"CustomerPass1"},{"name":"Customer2", "password":"CustomerPass2"},{"name":"Customer3", "password":"CustomerPass3"}]
 		},
 		{
 		  "insert":"restaurant",
-		  "documents": [{"name":"Restaurant1"},{"name":"Restaurant2"},{"name":"Restaurant3"}]
+		  "documents": [{"name":"Restaurant1", "password":"RestaurantPass1"},{"name":"Restaurant2", "password":"RestaurantPass2"},{"name":"Restaurant3", "password":"RestaurantPass3"}]
 		},
 		{
 		  "insert":"foodItem",
@@ -39,7 +39,7 @@ func Migrate(dbName string, client *mongo.Client) {
 		},
 		{
 		  "insert":"driver",
-		  "documents": [{"name":"Driver1"},{"name":"Driver2"},{"name":"Driver3"}]
+		  "documents": [{"name":"Driver1", "password":"DriverPass1"},{"name":"Driver2", "password":"DriverPass2"},{"name":"Driver3", "password":"DriverPass3"}]
 		}
 	]`)
 

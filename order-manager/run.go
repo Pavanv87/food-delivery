@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"order-manager/controller"
 	"order-manager/db"
@@ -27,8 +28,11 @@ func main() {
 	router.HandleFunc("/customer/order", authMiddleware(controller.GetOrderPlaceHandler(ctx, database))).Methods("POST")
 	router.HandleFunc("/customer/order/cancel", authMiddleware(controller.GetOrderCancelHandler(ctx, database))).Methods("POST")
 
+	router.HandleFunc("/restaurant/orders", authMiddleware(controller.GetNewOrdersHandler(ctx, database))).Methods("GET")
+	router.HandleFunc("/restaurant/order/update", authMiddleware(controller.GetOrderUpdateHandler(ctx, database))).Methods("POST")
+
 	fmt.Println("Auth Service Starting...")
-	http.ListenAndServe(":8080", router)
+	log.Fatalf("ListenAndServe Error: %s", http.ListenAndServe(":8082", router).Error())
 }
 
 // type contextKey int

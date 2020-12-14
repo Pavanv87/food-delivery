@@ -46,10 +46,11 @@ const (
 )
 
 type Order struct {
+	Id              primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Status          OrderStatus        `json:"status" bson:"status"`
 	Customer        string             `json:"customer" bson:"customer"`
 	FoodOrderDetail FoodOrderDetail    `json:"foodOrderDetail" bson:"foodOrderDetail"`
-	RestaurantId    primitive.ObjectID `json:"restaurantId" bson:"restaurantId"`
+	Restaurant      string             `json:"restaurant" bson:"restaurant"`
 }
 
 type Delivery struct {
