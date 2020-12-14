@@ -31,6 +31,9 @@ func main() {
 	router.HandleFunc("/restaurant/orders", authMiddleware(controller.GetNewOrdersHandler(ctx, database))).Methods("GET")
 	router.HandleFunc("/restaurant/order/update", authMiddleware(controller.GetOrderUpdateHandler(ctx, database))).Methods("POST")
 
+	router.HandleFunc("/driver/deliveries", authMiddleware(controller.GetNewDeliveriesHandler(ctx, database))).Methods("GET")
+	router.HandleFunc("/driver/delivery/update", authMiddleware(controller.GetDeliveryUpdateHandler(ctx, database))).Methods("POST")
+
 	fmt.Println("Auth Service Starting...")
 	log.Fatalf("ListenAndServe Error: %s", http.ListenAndServe(":8082", router).Error())
 }

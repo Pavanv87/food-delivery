@@ -14,12 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetNewOrdersHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
+func GetNewDeliveriesHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		resturantName := r.Context().Value(0).(string)
-		// Get new orders meant for this restaurant
-		filter := bson.D{primitive.E{Key: "status", Value: entities.New}, primitive.E{Key: "foodOrderDetail.fooditem.restaurant", Value: resturantName}}
+		filter := bson.D{primitive.E{Key: "status", Value: entities.Prepared}}
 		cur, err := database.Collection("order").Find(ctx, filter, options.Find())
 		defer cur.Close(ctx)
 
@@ -28,7 +26,7 @@ func GetNewOrdersHandler(ctx context.Context, database *mongo.Database) func(htt
 			return
 		}
 
-		results := make([]*entities.Order, 0) //empty slice
+		var results []*entities.Order
 		for cur.Next(ctx) {
 
 			// create a value into which the single document can be decoded
@@ -48,7 +46,7 @@ func GetNewOrdersHandler(ctx context.Context, database *mongo.Database) func(htt
 	}
 }
 
-func GetOrderUpdateHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
+func GetDeliveryUpdateHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		type OrderUpdate struct {
@@ -63,7 +61,6 @@ func GetOrderUpdateHandler(ctx context.Context, database *mongo.Database) func(h
 			log.Println("Invalid id")
 		}
 
-		// TODO: In general status cannot rollback
 		// TODO: after preparing, Status cannot be updated by other restaurants
 		resturantName := r.Context().Value(0).(string)
 

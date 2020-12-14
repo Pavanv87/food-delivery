@@ -31,11 +31,11 @@ func Migrate(dbName string, client *mongo.Client) {
 		},
 		{
 		  "insert":"restaurant",
-		  "documents": [{"name":"Restaurant1", "password":"RestaurantPass1"},{"name":"Restaurant2", "password":"RestaurantPass2"},{"name":"Restaurant3", "password":"RestaurantPass3"}]
+		  "documents": [{"name":"Restaurant1", "password":"RestaurantPass1", "address":{"doorNo":"1", "street":"1st main", "coordinates":{"x":0, "y":1}}},{"name":"Restaurant2", "password":"RestaurantPass2", "address":{"doorNo":"2", "street":"2nd main", "coordinates":{"x":0, "y":2}}},{"name":"Restaurant3", "password":"RestaurantPass3", "address":{"doorNo":"3", "street":"3rd main", "coordinates":{"x":0, "y":3}}}]
 		},
 		{
 		  "insert":"foodItem",
-		  "documents": [{"name":"FoodItem1","cost":50, "preparationTime":15},{"name":"FoodItem2","cost":70, "preparationTime":20},{"name":"FoodItem3","cost":100, "preparationTime":30}]
+		  "documents": [{"name":"FoodItem1","cost":50, "preparationTime":15,"restaurant":"Restaurant1"},{"name":"FoodItem2","cost":70, "preparationTime":20,"restaurant":"Restaurant1"},{"name":"FoodItem3","cost":100, "preparationTime":30,"restaurant":"Restaurant1"}]
 		},
 		{
 		  "insert":"driver",

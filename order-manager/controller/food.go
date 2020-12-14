@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"math"
 	"net/http"
 
 	"order-manager/entities"
@@ -16,8 +17,8 @@ import (
 )
 
 type DetailsRequestPayload struct {
-	Quantity int `json:"quantity"`
-	Distance int `json:"distance"` // In Kms
+	Quantity int              `json:"quantity"`
+	Address  entities.Address `json:"address"`
 }
 
 const Tax = 0.05
@@ -34,7 +35,7 @@ func GetOrderDetailHandler(ctx context.Context, database *mongo.Database) func(h
 		var foodItem entities.FoodItem
 		err = result.Decode(&foodItem)
 		if err != nil {
-			http.Error(w, err.Error(), 500)
+			http.Error(w, "Cannot find Food Item", 500)
 			return
 		}
 
@@ -46,11 +47,27 @@ func GetOrderDetailHandler(ctx context.Context, database *mongo.Database) func(h
 		detail.Quantity = payload.Quantity
 		detail.BaseCost = foodItem.Cost * payload.Quantity // Rate * Quantity
 		detail.Tax = float32(detail.BaseCost) * Tax
-		detail.DeliveryCharge = payload.Distance
+
+		result2 := database.Collection("restaurant").FindOne(ctx, bson.M{"name": foodItem.Restaurant})
+		var restaurant entities.Restaurant
+		err = result2.Decode(&restaurant)
+		if err != nil {
+			http.Error(w, "Cannot find Restaurant", 500)
+			return
+		}
+		dist := calculateDistance(payload.Address.Coordinates, restaurant.Address.Coordinates)
+		detail.Address = payload.Address
+		detail.DeliveryCharge = dist
 		detail.PreparationTime = foodItem.PreparationTime * payload.Quantity
-		detail.DeliveryTime = (payload.Distance * 60) / 40 //mins
+		detail.DeliveryTime = (dist * 60) / 40 //mins
 		json.NewEncoder(w).Encode(detail)
 	}
+}
+
+func calculateDistance(custCoord, restCoord entities.Coordinates) int {
+	first := math.Pow(float64(restCoord.X-custCoord.X), 2)
+	second := math.Pow(float64(restCoord.Y-custCoord.Y), 2)
+	return int(math.Sqrt(first + second))
 }
 
 func GetItemsHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
