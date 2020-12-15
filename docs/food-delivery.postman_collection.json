@@ -1,0 +1,342 @@
+{
+	"info": {
+		"_postman_id": "7a6a0038-e9db-458e-adbe-a04a25bd9407",
+		"name": "food-delivery",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "foodItems",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8082/food/items",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"food",
+						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "foodItem-detail",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"quantity\":2, \"address\":{\"doorNo\":\"11\", \"street\":\"11th main\", \"coordinates\":{\"x\":3, \"y\":0}}}"
+				},
+				"url": {
+					"raw": "localhost:8082/food/5fd792684527c5691d2de350/detail",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"food",
+						"5fd792684527c5691d2de350",
+						"detail"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "foodItem-order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkN1c3RvbWVyMSJ9.ijY9Qk3UqEntDg8vOspitHkJ4xoO_Tg23Hg3r2GEhIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"foodItem\":{\"id\":\"5fd792684527c5691d2de350\",\"name\":\"FoodItem3\",\"cost\":100,\"preparationTime\":30,\"restaurant\":\"Restaurant1\"},\"baseCost\":200,\"tax\":10,\"quantity\":2,\"deliveryCharge\":3,\"preparationTime\":60,\"address\":{\"doorNo\":\"11\",\"street\":\"11th main\",\"coordinates\":{\"x\":3,\"y\":0}},\"deliveryTime\":4}"
+				},
+				"url": {
+					"raw": "localhost:8082/customer/order",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"customer",
+						"order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "foodItem-order-cancel",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkN1c3RvbWVyMSJ9.ijY9Qk3UqEntDg8vOspitHkJ4xoO_Tg23Hg3r2GEhIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"5fd65140ce98b922facd92b9\"}"
+				},
+				"url": {
+					"raw": "localhost:8080/customer/order/cancel",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"customer",
+						"order",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "restaurant-new-orders",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlJlc3RhdXJhbnQxIn0.0Nv29GC_M-b-08J33Q6S0kFYO4RsZquSAgZeio3PAYI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/restaurant/orders",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"restaurant",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "restaurant-update-order-status",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlJlc3RhdXJhbnQyIn0.j08orj_jHkAD96b0H1FR7h_T-53vJ2wtC97W0w9KGBY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"5fd85b70c329b169bc0c36ae\",\"status\":\"PREPARED\"}"
+				},
+				"url": {
+					"raw": "localhost:8082/restaurant/order/update",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"restaurant",
+						"order",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "restaurant-invoice",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlJlc3RhdXJhbnQyIn0.j08orj_jHkAD96b0H1FR7h_T-53vJ2wtC97W0w9KGBY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"5fd85b70c329b169bc0c36ae\"}"
+				},
+				"url": {
+					"raw": "localhost:8082/restaurant/order/invoice",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"restaurant",
+						"order",
+						"invoice"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "driver-new-deliveries",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRyaXZlcjMifQ.-SEj1seDMYyD0DTnmC4FOHJoNHtaBD5MIiIUkvNmx7k",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/driver/deliveries",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"driver",
+						"deliveries"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "driver-update-delivery-status",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRyaXZlcjMifQ.-SEj1seDMYyD0DTnmC4FOHJoNHtaBD5MIiIUkvNmx7k",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"5fd85cacc329b169bc0c36af\",\"status\":\"PICKED\"}"
+				},
+				"url": {
+					"raw": "localhost:8082/driver/delivery/update",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"driver",
+						"delivery",
+						"update"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
