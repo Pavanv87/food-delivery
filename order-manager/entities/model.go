@@ -49,12 +49,13 @@ const (
 )
 
 type Order struct {
-	Id              primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Status          OrderStatus        `json:"status" bson:"status"`
-	Customer        string             `json:"customer" bson:"customer"`
-	FoodOrderDetail FoodOrderDetail    `json:"foodOrderDetail" bson:"foodOrderDetail"`
-	Address         Address            `json:"address" bson:"address"`
-	Driver          string             `json:"driver,omitempty" bson:"restaurant"`
+	Id              primitive.ObjectID  `json:"id" bson:"_id,omitempty"`
+	CreateTime      primitive.Timestamp `json:"createTime" bson:"createTime"`
+	Status          OrderStatus         `json:"status" bson:"status"`
+	Customer        string              `json:"customer" bson:"customer"`
+	FoodOrderDetail FoodOrderDetail     `json:"foodOrderDetail" bson:"foodOrderDetail"`
+	Address         Address             `json:"address" bson:"address"`
+	Driver          string              `json:"driver" bson:"driver"`
 }
 
 type Coordinates struct {

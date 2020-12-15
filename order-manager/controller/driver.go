@@ -17,8 +17,10 @@ import (
 func GetNewDeliveriesHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		findOptions := options.Find()
+		findOptions.SetSort(bson.D{{"createTime", 1}}) // sort order by ascending order
 		filter := bson.D{primitive.E{Key: "status", Value: entities.Prepared}}
-		cur, err := database.Collection("order").Find(ctx, filter, options.Find())
+		cur, err := database.Collection("order").Find(ctx, filter, findOptions) // returns all orders ready to be delivered
 		defer cur.Close(ctx)
 
 		if err != nil {
@@ -29,7 +31,6 @@ func GetNewDeliveriesHandler(ctx context.Context, database *mongo.Database) func
 		var results []*entities.Order
 		for cur.Next(ctx) {
 
-			// create a value into which the single document can be decoded
 			var elem entities.Order
 			err := cur.Decode(&elem)
 			if err != nil {
@@ -42,14 +43,14 @@ func GetNewDeliveriesHandler(ctx context.Context, database *mongo.Database) func
 			http.Error(w, err.Error(), 500)
 			return
 		}
-		json.NewEncoder(w).Encode(results)
+		json.NewEncoder(w).Encode(results) // TODO select first-in/oldest food-order for priority delivery, instead of returning all
 	}
 }
 
 func GetDeliveryUpdateHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		type OrderUpdate struct {
+		type OrderUpdate struct { // food order to be updated
 			Id     string `json:"id"`
 			Status string `json:"status"`
 		}
@@ -61,12 +62,13 @@ func GetDeliveryUpdateHandler(ctx context.Context, database *mongo.Database) fun
 			log.Println("Invalid id")
 		}
 
-		// TODO: after preparing, Status cannot be updated by other restaurants
-		resturantName := r.Context().Value(0).(string)
+		// TODO: Driver can set only {PICKED, DELIVERED} Status
+		// TODO restrict status being updated by other drivers/users
+		driverName := r.Context().Value(0).(string)
 
 		filter := bson.D{primitive.E{Key: "_id", Value: id}}
 		update := bson.D{primitive.E{Key: "$set", Value: bson.D{primitive.E{Key: "status", Value: order.Status},
-			primitive.E{Key: "restaurant", Value: resturantName}}}}
+			primitive.E{Key: "driver", Value: driverName}}}}
 
 		_, err = database.Collection(Order).UpdateOne(ctx, filter, update)
 		if err != nil {

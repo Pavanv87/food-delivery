@@ -30,29 +30,24 @@ func main() {
 
 	router.HandleFunc("/restaurant/orders", authMiddleware(controller.GetNewOrdersHandler(ctx, database))).Methods("GET")
 	router.HandleFunc("/restaurant/order/update", authMiddleware(controller.GetOrderUpdateHandler(ctx, database))).Methods("POST")
+	router.HandleFunc("/restaurant/order/invoice", authMiddleware(controller.GetOrderInvoiceHandler(ctx, database))).Methods("POST")
 
 	router.HandleFunc("/driver/deliveries", authMiddleware(controller.GetNewDeliveriesHandler(ctx, database))).Methods("GET")
 	router.HandleFunc("/driver/delivery/update", authMiddleware(controller.GetDeliveryUpdateHandler(ctx, database))).Methods("POST")
 
-	fmt.Println("Auth Service Starting...")
+	fmt.Println("Order-Manager Service Starting...")
 	log.Fatalf("ListenAndServe Error: %s", http.ListenAndServe(":8082", router).Error())
 }
-
-// type contextKey int
-
-// const (
-// 	CustomerKey contextKey = iota
-// )
 
 func authMiddleware(next func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		client := &http.Client{}
-		req, _ := http.NewRequest("GET", "http://localhost:8081/auth/verify", nil)
+		req, _ := http.NewRequest("GET", "http://localhost:8081/auth/verify", nil) // TODO remove hardcoding
 		req.Header = r.Header
 		resp, _ := client.Do(req)
 
 		type Auth struct {
-			Claim struct {
+			Claim struct { // Needed to Forbid access of api based on roles
 				Name string `json:"username"`
 			} `json:"claim"`
 		}

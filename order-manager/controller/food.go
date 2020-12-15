@@ -29,7 +29,8 @@ func GetOrderDetailHandler(ctx context.Context, database *mongo.Database) func(h
 
 		id, err := primitive.ObjectIDFromHex(vars["id"])
 		if err != nil {
-			log.Println("Invalid id")
+			http.Error(w, "Invalid id", 500) // TODO Need structured error response
+			return
 		}
 		result := database.Collection("foodItem").FindOne(ctx, bson.M{"_id": id})
 		var foodItem entities.FoodItem
@@ -42,6 +43,7 @@ func GetOrderDetailHandler(ctx context.Context, database *mongo.Database) func(h
 		var payload DetailsRequestPayload
 		json.NewDecoder(r.Body).Decode(&payload)
 
+		// Calculate the details for ordering an item
 		var detail entities.FoodOrderDetail
 		detail.FoodItem = foodItem
 		detail.Quantity = payload.Quantity
@@ -55,11 +57,11 @@ func GetOrderDetailHandler(ctx context.Context, database *mongo.Database) func(h
 			http.Error(w, "Cannot find Restaurant", 500)
 			return
 		}
-		dist := calculateDistance(payload.Address.Coordinates, restaurant.Address.Coordinates)
+		dist := calculateDistance(payload.Address.Coordinates, restaurant.Address.Coordinates) // calculate distance between coords
 		detail.Address = payload.Address
 		detail.DeliveryCharge = dist
 		detail.PreparationTime = foodItem.PreparationTime * payload.Quantity
-		detail.DeliveryTime = (dist * 60) / 40 //mins
+		detail.DeliveryTime = (dist * 60) / 40 // in mins
 		json.NewEncoder(w).Encode(detail)
 	}
 }
@@ -67,13 +69,13 @@ func GetOrderDetailHandler(ctx context.Context, database *mongo.Database) func(h
 func calculateDistance(custCoord, restCoord entities.Coordinates) int {
 	first := math.Pow(float64(restCoord.X-custCoord.X), 2)
 	second := math.Pow(float64(restCoord.Y-custCoord.Y), 2)
-	return int(math.Sqrt(first + second))
+	return int(math.Sqrt(first + second)) // one way to get distance
 }
 
 func GetItemsHandler(ctx context.Context, database *mongo.Database) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		cur, err := database.Collection("foodItem").Find(ctx, bson.D{{}}, options.Find())
+		cur, err := database.Collection("foodItem").Find(ctx, bson.D{{}}, options.Find()) // all available food items
 		defer cur.Close(ctx)
 
 		if err != nil {
@@ -84,14 +86,11 @@ func GetItemsHandler(ctx context.Context, database *mongo.Database) func(http.Re
 		var results []*entities.FoodItem
 		for cur.Next(ctx) {
 
-			// create a value into which the single document can be decoded
 			var elem entities.FoodItem
 			err := cur.Decode(&elem)
 			if err != nil {
 				log.Println(err)
 			}
-			log.Println("ID: " + elem.Id.Hex())
-
 			results = append(results, &elem)
 		}
 		if err := cur.Err(); err != nil {
